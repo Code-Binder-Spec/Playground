@@ -12,13 +12,11 @@ async def creation_task2(a,b):
        await asyncio.sleep(3)
        print(f"{a}-{b} = {c}")
 
-
 async def all():
-                    sub = asyncio.create_task(creation_task2(10,5))
-                    print("Substract task created ")
-                    await sub
-                    ad = asyncio.create_task(creation_task_1(9,4))
-                    print("addition task created")
-                    await ad
-
+              ad = asyncio.create_task(creation_task_1(6,4))
+              sub = asyncio.create_task(creation_task2(7,1))
+              print("Both object created ")
+              await sub
+              await ad
+                           
 asyncio.run(all())
