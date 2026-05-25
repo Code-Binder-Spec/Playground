@@ -21,8 +21,6 @@ async def all():
               data = asyncio.create_task(datbase())
               api = asyncio.create_task(api_call())
               print("All task created")
-              await data
-              await file
-              await api
+              await data,file,api
 
 asyncio.run(all())
