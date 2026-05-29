@@ -12,8 +12,8 @@ async def carshop():
 
 async def all():
     task1 = asyncio.create_task(mall())
+    await task1
     task2 = asyncio.create_task(carshop())
     await task2
-    await task1
 
 asyncio.run(all())
