@@ -1,6 +1,6 @@
 import asyncio
 
-sem = asyncio.Semaphore(4)
+sem = asyncio.Semaphore(3)
 
 async def car_washing(car,time):
     async with sem:
