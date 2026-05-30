@@ -9,7 +9,7 @@ async def web_request(url,session):
                                                    print(f"Url : {url}. Status : {response.status}")
 
 async def all():
-      async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session :
+      async with aiohttp.ClientSession() as session :
                     await asyncio.gather(
                              web_request("https://google.com",session),
                              web_request("https://github.com",session),
