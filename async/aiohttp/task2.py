@@ -5,7 +5,7 @@ sem = asyncio.Semaphore(2)
 
 async def web_request(url,session):
     async with sem :
-                     async with session.get(url) as response:
+                     async with session.get(url,timeout=aiohttp.ClientTimeout(total=4)) as response:
                                                    print(f"Url : {url}. Status : {response.status}")
 
 async def all():
