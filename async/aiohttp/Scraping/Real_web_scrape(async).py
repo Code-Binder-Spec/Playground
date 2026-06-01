@@ -8,27 +8,49 @@ async def getting_source(url):
               async with session.get(url,timeout=aiohttp.ClientTimeout(total=7)) as response:
                         return await response.text()
               
-def extracting_deep_details(titles,scores,comments):
-        lis_title = []
-        lis_score = []
-        lis_comment_count = []
-        for title,score,comment in zip(titles,scores,comments) :
-                lis_comment_count.append(comment)
-                title_name = title.find("a").text
-                lis_title.append(title_name)
-                score_point = score.text
-                lis_score.append(score_point)
-                comment = comment.text
-                print(f"Title : {title_name} , Score : {score_point} , Comments : {comment}")
-                
-async def extracting_details(url):
+def score_scraping(soup):
+        scores = [score.text for score in soup.select("span.score")]
+        return scores
+
+def title_scraping(soup):
+        titles = []
+        for title in soup.select("span.titleline a"):
+                titles.append(title.text)
+        return titles
+
+def comment_scraping(soup):
+        comments = []
+        for comment in soup.select("span.subline a"):
+                if "comment" in comment.text:
+                        comments.append(comment.text)
+                else :
+                        comments.append("No comments")
+        return(comments)
+
+async def all_function_calling(soup):
+           scores =  score_scraping(soup)
+           titles =title_scraping(soup)
+           comments = comment_scraping(soup)
+           return [{"Title" : title ,"Score"  : score,"Comment count" : comment } for title,score,comment in zip(titles,scores,comments)]
+
+async def passing_soup(url):
         source = await getting_source(url)
         soup = BeautifulSoup(source,"html.parser")
-        titles = soup.find_all("span",class_="titleline")
-        scores = soup.find_all("span",class_="score")
-        comments_count = [a for a in soup.select(".subline a") if "comments" in a.text]
-        extracting_deep_details(titles,scores,comments_count)
+        result = await all_function_calling(soup)
+        return result
+
+async def main():
+        urls = [f"https://news.ycombinator.com/?p={i}" for i in range(1,31) ]
+        result = await asyncio.gather(*[passing_soup(url) for url in urls])
+        with open("Hackernews.json","w",encoding="utf-8") as f:
+                   full_data = []
+                   for page in result:
+                                     for details in page:
+                                             full_data.append(details)
+                   json.dump(full_data,f,indent=4)
+                                             
+
+asyncio.run(main())
 
 
-asyncio.run(extracting_details("https://news.ycombinator.com/"))
         
