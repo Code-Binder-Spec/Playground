@@ -27,17 +27,20 @@ def title_scraping(soup):
         return title
 
 def comment_scraping(trs2):
-        if trs2.find("span",class_="subline").find_all("a"):
+        if trs2.find("span",class_="subline"):
                 if len(trs2.find("span",class_="subline").find_all("a")) > 2:
-                                comment = trs2.find("span",class_="subline").find_all("a")[2].text
+                                comment = trs2.find("span",class_="subline").find_all("a")[3].text
                 else :
-                               comment = "discuss"
+                                comment = "discuss"
+        else : 
+                comment = "discuss"
         return comment
 
 async def all_function_calling(trs,trs2):
            score =  score_scraping(trs2)
            title = title_scraping(trs)
-           return {"Title" : title ,"Score"  : score} 
+           comment = comment_scraping(trs2)
+           return {"Title" : title ,"Score"  : score , "comment" : comment} 
 
 async def passing_soup(url):
         source = await getting_source(url)
