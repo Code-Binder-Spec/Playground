@@ -3,47 +3,59 @@ from bs4 import BeautifulSoup
 import aiohttp
 import json
 
+sem = asyncio.Semaphore(3)
+
 async def getting_source(url):
-       async with aiohttp.ClientSession() as session:
-              async with session.get(url,timeout=aiohttp.ClientTimeout(total=7)) as response:
-                        return await response.text()
+       async with sem :
+                    async with aiohttp.ClientSession() as session:
+                                        async with session.get(url,timeout=aiohttp.ClientTimeout(total=7)) as response:
+                                                              return await response.text()
               
-def score_scraping(soup):
-        scores = [score.text for score in soup.select("span.score")]
-        return scores
+def score_scraping(trs2):
+        if trs2.find("span",class_="score"):
+                    score = trs2.find("span",class_="score").text
+        else :
+                score = "0 point"
+        return score
 
 def title_scraping(soup):
-        titles = []
-        for title in soup.select("span.titleline a"):
-                titles.append(title.text)
-        return titles
+        if soup.find("span",class_="titleline").find("a"):
+                title = soup.find("span",class_="titleline").find("a").text
+        else :
+                title = "missing"
+        print(title)
+        return title
 
-def comment_scraping(soup):
-        comments = []
-        for comment in soup.select("span.subline a"):
-                if "comment" in comment.text:
-                        comments.append(comment.text)
+def comment_scraping(trs2):
+        if trs2.find("span",class_="subline").find_all("a"):
+                if len(trs2.find("span",class_="subline").find_all("a")) > 2:
+                                comment = trs2.find("span",class_="subline").find_all("a")[2].text
                 else :
-                        comments.append("No comments")
-        return(comments)
+                               comment = "discuss"
+        return comment
 
-async def all_function_calling(soup):
-           scores =  score_scraping(soup)
-           titles =title_scraping(soup)
-           comments = comment_scraping(soup)
-           return [{"Title" : title ,"Score"  : score,"Comment count" : comment } for title,score,comment in zip(titles,scores,comments)]
+async def all_function_calling(trs,trs2):
+           score =  score_scraping(trs2)
+           title = title_scraping(trs)
+           return {"Title" : title ,"Score"  : score} 
 
 async def passing_soup(url):
         source = await getting_source(url)
         soup = BeautifulSoup(source,"html.parser")
-        result = await all_function_calling(soup)
-        return result
-
+        athing_submission = soup.find_all("tr",class_="athing submission")
+        lis_data = []
+        for tr1 in athing_submission:
+                 tr2 = tr1.find_next_sibling("tr")
+                 data = await all_function_calling(tr1,tr2)
+                 lis_data.append(data)
+        return lis_data
 async def main():
+        
         urls = [f"https://news.ycombinator.com/?p={i}" for i in range(1,31) ]
         result = await asyncio.gather(*[passing_soup(url) for url in urls])
+        print(result)
+        full_data = []
         with open("Hackernews.json","w",encoding="utf-8") as f:
-                   full_data = []
                    for page in result:
                                      for details in page:
                                              full_data.append(details)
