@@ -5,11 +5,13 @@ import json
 
 sem = asyncio.Semaphore(3)
 
-async def getting_source(url):
-       async with sem :
-                    async with aiohttp.ClientSession() as session:
-                                        async with session.get(url,timeout=aiohttp.ClientTimeout(total=7)) as response:
-                                                              return await response.text()
+async def getting_source(url,session):
+       try :
+              async with sem :
+                      async with session.get(url,timeout=aiohttp.ClientTimeout(total=7)) as response:
+                                return await response.text()
+       except Exception as e  :
+                    return e
               
 def score_scraping(trs2):
         if trs2.find("span",class_="score"):
@@ -42,8 +44,10 @@ async def all_function_calling(trs,trs2):
            comment = comment_scraping(trs2)
            return {"Title" : title ,"Score"  : score , "comment" : comment} 
 
-async def passing_soup(url):
-        source = await getting_source(url)
+async def passing_soup(url,session):
+        source = await getting_source(url,session)
+        if isinstance(source,Exception):
+                return [f"url : {url} failed to fecth details due to {source}"]
         soup = BeautifulSoup(source,"html.parser")
         athing_submission = soup.find_all("tr",class_="athing submission")
         lis_data = []
@@ -53,18 +57,16 @@ async def passing_soup(url):
                  lis_data.append(data)
         return lis_data
 async def main():
-        
-        urls = [f"https://news.ycombinator.com/?p={i}" for i in range(1,31) ]
-        result = await asyncio.gather(*[passing_soup(url) for url in urls])
-        print(result)
-        full_data = []
-        with open("Hackernews.json","w",encoding="utf-8") as f:
-                   for page in result:
-                                     for details in page:
-                                             full_data.append(details)
-                   json.dump(full_data,f,indent=4)
-                                             
-
+         async with aiohttp.ClientSession() as session:
+                 urls = [f"https://news.ycombinator.com/?p={i}" for i in range(1,31) ]
+                 result = await asyncio.gather(*[passing_soup(url,session) for url in urls])
+                 print(result)
+                 full_data = []
+                 with open("Hackernews.json","w",encoding="utf-8") as f:
+                           for page in result:
+                                        for details in page:
+                                                full_data.append(details)
+                           json.dump(full_data,f,indent=4)
 asyncio.run(main())
 
 
