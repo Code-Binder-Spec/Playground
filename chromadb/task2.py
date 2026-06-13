@@ -1,5 +1,5 @@
 import chromadb
-from groq import Groq
+#from groq import Groq
 
 client = chromadb.PersistentClient("task2.db")
 collection_movie = client.get_or_create_collection("movies")

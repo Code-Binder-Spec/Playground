@@ -1,5 +1,5 @@
 import chromadb
-from groq import Groq
+#from groq import Groq
 client = chromadb.PersistentClient(path="task1.db")
 collection = client.get_or_create_collection("task1")
 question = "Who is barbie ?"

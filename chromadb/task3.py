@@ -1,5 +1,5 @@
 import chromadb
-from groq import Groq
+#from groq import Groq
 
 client = chromadb.PersistentClient("allu.db")
 collection = client.get_or_create_collection("allu")
