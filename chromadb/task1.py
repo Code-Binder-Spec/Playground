@@ -15,7 +15,7 @@ result = collection.query(
     n_results=1
    )
 chunk = result["documents"][0][0]
-groq_client = Groq(api_key="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")
+groq_client = Groq(api_key="cant show in github")
 message = groq_client.chat.completions.create(
     model="llama-3.3-70b-versatile",
     max_tokens=1024,

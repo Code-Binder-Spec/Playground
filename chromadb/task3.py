@@ -15,7 +15,7 @@ if collection.count() == 0:
     )
 
 print("Type stop in query to exit \n")
-groq_client = Groq(api_key="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")
+groq_client = Groq(api_key="cant show in github")
 
 while True:
     query = str(input("YOU : "))
