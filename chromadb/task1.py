@@ -15,7 +15,7 @@ result = collection.query(
     n_results=1
    )
 chunk = result["documents"][0][0]
-groq_client = Groq(api_key="cant show in github")
+#there is groq api but due to github dont allow it i removed
 message = groq_client.chat.completions.create(
     model="llama-3.3-70b-versatile",
     max_tokens=1024,
