@@ -1,5 +1,10 @@
 import chromadb
-#from groq import Groq
+from groq import Groq
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 client = chromadb.PersistentClient(path="task1.db")
 collection = client.get_or_create_collection("task1")
 question = "Who is barbie ?"
@@ -15,7 +20,7 @@ result = collection.query(
     n_results=1
    )
 chunk = result["documents"][0][0]
-#there is groq api but due to github dont allow it i removed
+groq_client = Groq(api_key=(os.getenv("GROQ_API_KEY")))
 message = groq_client.chat.completions.create(
     model="llama-3.3-70b-versatile",
     max_tokens=1024,

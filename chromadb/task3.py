@@ -1,5 +1,9 @@
 import chromadb
-#from groq import Groq
+from groq import Groq
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 client = chromadb.PersistentClient("allu.db")
 collection = client.get_or_create_collection("allu")
@@ -15,7 +19,8 @@ if collection.count() == 0:
     )
 
 print("Type stop in query to exit \n")
-#there is groq api but due to github dont allow it i removed
+
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 while True:
     query = str(input("YOU : "))

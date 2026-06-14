@@ -1,5 +1,9 @@
 import chromadb
-#from groq import Groq
+import os
+from dotenv import load_dotenv
+from groq import Groq
+
+load_dotenv()
 
 client = chromadb.PersistentClient("task2.db")
 collection_movie = client.get_or_create_collection("movies")
@@ -33,7 +37,7 @@ chunk_movie = result_movie["documents"][0][0]
 chunk_book_list = result_book["documents"][0]
 chunk_book = '\n\n'.join(chunk_book_list)
 
-#there is groq api but due to github dont allow it i removed
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 message = groq_client.chat.completions.create(
     model="llama-3.3-70b-versatile",
     max_tokens=1024,
