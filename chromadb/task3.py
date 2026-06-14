@@ -18,13 +18,15 @@ if collection.count() == 0:
         metadatas=[{"Name":"Azil"},{"Name":"Amna"},{"Name":"Aqil"},{"Name":"Arya"},{"Name":"Anna"}]
     )
 
-print("Type stop in query to exit \n")
+print("\n Type stop in query to exit \n")
 
 messages_lis = []
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 messages_lis.append({"role": "system", "content": "Answer only from the context provided. If the answer is not in the context, say 'I don't know'. Always refer to the person by their name. If the user only mentions a name without a question, ask 'What would you like to know about {name}?' and wait. If no name is mentioned, ask for it before answering."})
 active_name = None
+
 while True:
+   
     metadata_v = None
     query = str(input("YOU : "))
     if query.lower() == "stop":
@@ -45,23 +47,25 @@ while True:
                     elif "anna" in query.lower():
                                    metadata_v = {"Name":"Anna"}
                                    active_name = "Anna"
-                    else:
-                                   print("\n")
-                    if metadata_v is None and active_name:
-                             metadata_v = {"Name":active_name}
-                             result = collection.query(
+                   
+                    if metadata_v is None and active_name is None:
+                                    chunk = None
+                    elif metadata_v is None and active_name :
+                               metadata_v = {"Name":active_name}
+                               result = collection.query(
                                                    query_texts=[query],
                                                    where=metadata_v,
                                                    n_results=1
                                                )  
+                               chunk = result["documents"][0][0]
                     else :
-                             result = collection.query(
-                                                   query_texts=[query],
-                                                   where=metadata_v,
-                                                   n_results=1
-                                               )
-
-                    chunk = result["documents"][0][0]
+                                 result = collection.query(
+                                        query_texts=[query],
+                                        where=metadata_v,
+                                        n_results=1
+                                               )    
+                                 chunk = result["documents"][0][0]   
+                    
                     messages_lis.append({"role":"user","content" : f"Context : {chunk}\n\nQuestion : {query}"})
                     message = groq_client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
