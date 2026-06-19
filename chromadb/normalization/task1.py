@@ -5,12 +5,16 @@ import chromadb
 
 load_dotenv() 
 
+avoiding_words = {"is","are","am","this","that","was","were","there","their","in","on"}
+
 def keyword_matching_function(query,chunk):
         score = 0
         lis_query =  query.lower().split()
         lis_chunk = chunk.lower().split()
         for word in lis_chunk:
-                if word in lis_query:
+                if word in avoiding_words:
+                        continue
+                elif word in lis_query:
                         score += 1
                 else:
                         continue
@@ -47,7 +51,7 @@ while True :
                  updated_distances = [0 if d==0 else 1-d for d in pending_update_distance]
                  sum_list = []
                  for i in range(len(chunks)):
-                         sum_score = updated_score[i] + updated_distances[i]
+                         sum_score = updated_score[i]*0.7 + updated_distances[i]*0.3
                          sum_list.append(sum_score)
                  max_number = 0
                  position = 0
@@ -58,13 +62,6 @@ while True :
                          else :
                                  continue
                  real_data_for_retreival = chunks[position]
-                 print(chunks)
-                 print("keyword scores:", scores)
-                 print("normalized keyword:", updated_score)
-                 print("distances:", distances)
-                 print("normalized distance:", updated_distances)
-                 print("sum:", sum_list)
-                 print(real_data_for_retreival)
                  message = groq_client.chat.completions.create(
                              model="llama-3.3-70b-versatile",
                              max_tokens=1024,
