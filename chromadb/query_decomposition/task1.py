@@ -65,10 +65,11 @@ while True:
         model="llama-3.3-70b-versatile",
         max_tokens=1024,
         messages=[
-            {"role" : "system","content":f"context : {query}\n\ninstructions : From the context return only valid json of sub questions even its one.the content of json should be should be the questions seperately in context with proper english fixed . no related things.it should be a python list.If theres no question return just no question json no other words."}
+            {"role" : "system","content":f"context : {query}\n\ninstructions :You will receive a user's input, which may contain one or more questions combined together. Your task is to split it into separate, complete, well-formed questions — do NOT answer them. Return ONLY a valid JSON array of strings, one string per question. If the input contains no actual question (for example: a greeting, statement, or random text), return a JSON array containing exactly one string: no question. Return nothing else — no answers, no explanations, no extra text."}
         ]
     )
     decomposed = message_1.choices[0].message.content
+    print(decomposed)
     decomposed_list = json.loads(decomposed)
     cleaned_questions = " ".join(decomposed_list)
     decomposed_data = []
@@ -84,7 +85,7 @@ while True:
         model="llama-3.3-70b-versatile",
         max_tokens=1024,
         messages=[
-               {"role":"user","content":f"context : {clean_context}\n\ninstructions : Answer only from context if answer is not in context say i dont know.if theres multiple question answer for each.\n\nQuestion : {cleaned_questions}"}
+               {"role":"user","content":f"context : {clean_context}\n\ninstructions : Answer only from context if answer is not in context say i dont know.if theres multiple question answer for each.response should be celan readable organized output\n\nQuestion : {cleaned_questions}"}
         ]
     )
     print(f" AI : {message_2.choices[0].message.content}")
