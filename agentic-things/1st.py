@@ -25,17 +25,31 @@ while True:
 
     agent_a_output = ai_reply(you)
     print(f"\nAGENT A'S ANSWER : {agent_a_output}")
-    agent_b_output = ai_reply(f"Here is a draft answer: {agent_a_output}. Point out one flaw or say APPROVED if there isn't one.No need to include the word APPROVED if its not correct")
+    agent_b_output =  ai_reply(
+    f"Question: {you}\n\n"
+    f"Answer to evaluate:\n{agent_a_output}\n\n"
+    f"Evaluate this answer strictly against the question. "
+    f"Only flag an issue if the answer is factually incorrect, incomplete, "
+    f"or fails to actually answer the question. "
+    f"Do not suggest stylistic, tone, or minor wording improvements. "
+    f"If the answer meets this bar, respond with exactly: APPROVED\n"
+    f"If it does not, respond with exactly: NEEDS REVISION, followed by "
+    f"a one-sentence explanation of the specific factual or completeness issue."
+    f"Return only explanation of critique . NO other outputs"
+)
     print(f"\nAGENT B'S STATUS ON THE OUTPUT OF AGENT A : {agent_b_output}")
     if "approved" in agent_b_output.lower():
          break
     else :
+             original_query = you
              you = (
-                           f"Original answer:\n{agent_a_output}\n\n"
-                           f"Critique:\n{agent_b_output}\n\n"
-                           f"Please revise the original answer to address the critique above. "
-                           f"Return only the revised answer."
-                  ) 
+                     f"Original question: {original_query}\n\n"
+                     f"Original answer:\n{agent_a_output}\n\n"
+                     f"Critique:\n{agent_b_output}\n\n"
+                     f"Revise the original answer to address the critique above. "
+                     f"Return only the revised answer, with no explanation or commentary."
+               )
+print("honestly this is for showup my hand is bandaged and due study pressure")
 
 
 
