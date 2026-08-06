@@ -49,7 +49,7 @@ while True:
                      f"Revise the original answer to address the critique above. "
                      f"Return only the revised answer, with no explanation or commentary."
                )
-print("honestly this is for showup my hand is bandaged and due study pressure")
+print("honestly dont know what to do again only for showup")
 
 
 
