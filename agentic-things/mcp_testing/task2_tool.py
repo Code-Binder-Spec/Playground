@@ -36,8 +36,12 @@ def division(list_name):
     divided = 0
     try :
          for i in list_name:
-             divided = i/base
-             base = i
+             if i == list_name[0]:
+                       divided = i/list_name[1]
+             elif i == list_name[1]:
+                  continue
+             else :
+                  divided = divided/i
     except Exception as e :
              divided = f"Error occured : {e}"
     return divided
