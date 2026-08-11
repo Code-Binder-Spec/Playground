@@ -32,18 +32,17 @@ def multiplication(list_name):
 
 @mcp.tool()
 def division(list_name):
-    base = 1
     divided = 0
     try :
-         for i in list_name:
-             if i == list_name[0]:
-                       divided = i/list_name[1]
-             elif i == list_name[1]:
-                  continue
+         for i in range(len(list_name)):
+             if i == 0:
+                       divided = list_name[i]/list_name[i+1]
+             elif i == 1:
+                   continue
              else :
-                  divided = divided/i
+                  divided = divided/list_name[i]
     except Exception as e :
-             divided = f"Error occured : {e}"
+              divided = f"Error occured : {e}"
     return divided
 
 if __name__ == "__main__":
