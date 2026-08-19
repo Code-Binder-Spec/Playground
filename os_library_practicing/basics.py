@@ -46,33 +46,33 @@ def specific_entry_lister(path,type):
             items = os.listdir(path)
             fun_for_printing_specific_entry(items,type,path)
 
-def specific_entry_adder(path,type):
+def specific_entry_adder(path,type,name,file_type):
         file_type_list = ["txt", "md", "log", "csv", "env", "yaml", "yml", "py", "sh", "html"]
         try :
                        if type == "file":
-                                      file_name = str(input("Enter file name : "))
-                                      file_type = str(input("Enter file type [no dot needed].[only text based formats allowed] : "))
                                       if file_type.lower() not in file_type_list:
                                               raise ValueError("The file type you mentioned is invalid . check is it a text based format or it contains dot")
-                                      with open(f"{path}/{file_name}.{file_type.lower()}","w") as f:
+                                      with open(f"{path}/{name}.{file_type.lower()}","w") as f:
                                               pass
                        elif type == "folder":
-                                      folder_name = str(input("Please enter the folder name : "))
-                                      full_path = os.path.join(path,folder_name)
+                                      full_path = os.path.join(path,name)
                                       os.mkdir(full_path)
         except Exception as e :
                 print(f"error occured while creating . error : {e}")
                                 
 
 def entry_remover(path) :
-        os.remove(path)
+        try :
+            if os.path.isdir(path):
+                             os.rmdir(path)
+            else :
+                             os.remove(path)
+        except Exception as e:
+                print(f"error occured : {e}")
         
                    
-cur_path = "/home/coder/coding/Validation-Database-Web-scarping"
-specific_entry_exist_checker(cur_path)
-content_fetcher(cur_path)
-print("content fetcher finished")
-specific_entry_lister(cur_path,"folder")
+cur_path = "/home/coder/Downloads/testing_code"
+entry_remover(cur_path)
 
 
 
