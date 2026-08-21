@@ -28,7 +28,7 @@ def making_into_groq_format(mcp_tools):
                                 "function": {
                                         "name":tool.name,
                                         "description":tool.description,
-                                        "parameters":tool.inputSchema
+                                        "parameters":tool.input_schema
                                 }
                         }
                 )
@@ -54,7 +54,7 @@ async def main():
                                    user_data = str(input(data))
                                    messages.append({"role":"user","content":f"{user_data}"})
                                    response = groq_client.chat.completions.create(
-                                            model="llama-3.3-70b-versatile",
+                                            model="openai/gpt-oss-120b",
                                             max_tokens=1024,
                                             messages=messages,
                                             tools=groq_tools,
@@ -65,7 +65,7 @@ async def main():
                                    if message.tool_calls:
                                            tool_call = message.tool_calls[0]
                                            result = await session.call_tool(tool_call.function.name,json.loads(tool_call.function.arguments))
-                                           print(result)
+                                           print(result.content[0].text)
                                            break
                                    else :
                                            data = message.content

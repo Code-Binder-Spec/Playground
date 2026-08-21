@@ -15,7 +15,7 @@ def content_fetcher(path,depth=0):
     data = None
     try:
                       checking_path_exist(path)
-                      with open(f"{path}\Content_tree.txt","w+") as f:
+                      with open(os.path.join(path,"Content_tree.txt"),"w+") as f:
                               items  = os.listdir(path)
                               for item in items :
                                      full_path = os.path.join(path,item)
@@ -51,7 +51,7 @@ def specific_entry_lister(type,path):
         "Lists only the files or only the folders (not both) directly inside a given directory, one level deep — does not look inside subfolders."
         try :
                     checking_path_exist(path)
-                    with open(f"{path}\specific_entry.txt","w+") as f:
+                    with open((path,"specific_entry.txt"),"w+") as f:
                             file = None
                             folder = None
                             if type == "file":
@@ -81,7 +81,7 @@ def specific_entry_adder(path,type,name,file_type):
                        if type == "file":
                                       if file_type.lower() not in file_type_list:
                                               raise ValueError("The file type you mentioned is invalid . check is it a text based format or it contains dot")
-                                      with open(f"{path}/{name}.{file_type.lower()}","w") as f:
+                                      with open(os.path.join(path,f"{name}.{file_type.lower()}"),"w") as f:
                                               pass
                        elif type == "folder":
                                       full_path = os.path.join(path,name)
@@ -116,3 +116,6 @@ def entry_remover(path) :
         except Exception as e:
                   data = f"Deletion status Failed due to error : {e}"
         return data
+
+if __name__ == "__main__":
+        mcp.run()
