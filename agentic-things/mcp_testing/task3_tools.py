@@ -10,12 +10,12 @@ def checking_path_exist(path):
                 raise ValueError("Path doesnt exist")
 
 @mcp.tool()
-def content_fetcher(path,depth=0):
+def content_fetcher(path:str,depth:int=0):
     "Recursively lists all files and subfolders inside a given directory, including everything nested at any depth, and returns the result in an indented tree structure showing the folder hierarchy"
     data = None
     try:
                       checking_path_exist(path)
-                      with open(os.path.join(path,"Content_tree.txt"),"w+") as f:
+                      with open(os.path.join(path,"Content_tree.txt"),"a+") as f:
                               items  = os.listdir(path)
                               for item in items :
                                      full_path = os.path.join(path,item)
@@ -34,7 +34,7 @@ def content_fetcher(path,depth=0):
     return data 
 
 @mcp.tool()
-def specific_entry_exist_checker(path):
+def specific_entry_exist_checker(path:str):
     "Checks whether a given path exists on the filesystem, and if it does, reports whether it is a file or a folder."
     data = None
     if os.path.exists(path):
@@ -47,7 +47,7 @@ def specific_entry_exist_checker(path):
     return data
 
 @mcp.tool()       
-def specific_entry_lister(type,path):
+def specific_entry_lister(type:str,path:str):
         "Lists only the files or only the folders (not both) directly inside a given directory, one level deep — does not look inside subfolders."
         try :
                     checking_path_exist(path)
@@ -73,7 +73,7 @@ def specific_entry_lister(type,path):
         return data
 
 @mcp.tool()
-def specific_entry_adder(path,type,name,file_type):
+def specific_entry_adder(path:str,type:str,name:str,file_type:str):
         "Creates a new empty file or a new empty folder at the given path. For files, only plain text-based formats are allowed (e.g. txt, md, py)."
         data = None
         file_type_list = ["txt", "md", "log", "csv", "env", "yaml", "yml", "py", "sh", "html"]
@@ -101,7 +101,7 @@ def checking_the_safety_of_data(path):
 
 
 @mcp.tool()
-def entry_remover(path) :
+def entry_remover(path:str) :
         "Permanently deletes a file, or a folder and everything inside it (including all nested subfolders and files), at the given path. Only paths inside the allowed safe directory can be deleted; requests outside that area will be rejected"
         data = None
         try :
