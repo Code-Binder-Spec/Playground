@@ -9,29 +9,35 @@ def checking_path_exist(path):
         else :
                 raise ValueError("Path doesnt exist")
 
-@mcp.tool()
-def content_fetcher(path:str,depth:int=0):
-    "Recursively lists all files and subfolders inside a given directory, including everything nested at any depth, and returns the result in an indented tree structure showing the folder hierarchy"
-    data = None
-    try:
-                      checking_path_exist(path)
-                      with open(os.path.join(path,"Content_tree.txt"),"a+") as f:
+
+def function_for_content_fetcher(path:str,file_connection,depth:int=0):               
                               items  = os.listdir(path)
                               for item in items :
                                      full_path = os.path.join(path,item)
                                      indent = "     "*depth
 
                                      if os.path.isdir(full_path):
-                                               f.write(f"\n{indent} {item}")
-                                               content_fetcher(full_path,depth+1)
+                                               file_connection.write(f"\n{indent} {item}")
+                                               function_for_content_fetcher(full_path,file_connection,depth+1)
                                      else :
-                                                f.write(f"\n{indent} {item}")
+                                                file_connection.write(f"\n{indent} {item}")
+
+
+@mcp.tool()
+def content_fetcher(path:str):
+    "Recursively lists all files and subfolders inside the given directory path, including everything nested at any depth, and returns the result as an indented tree structure showing the folder hierarchy. Takes a single argument: the folder path to start from."
+    data = None
+    try:
+                      checking_path_exist(path)
+                      with open(os.path.join(path,"Content_tree.txt"),"a+") as f :
+                              function_for_content_fetcher(path,f)
                               text = f.read()
                               data = text
     except Exception as e :
             data = f"error occured . error : {e}"
 
     return data 
+
 
 @mcp.tool()
 def specific_entry_exist_checker(path:str):
