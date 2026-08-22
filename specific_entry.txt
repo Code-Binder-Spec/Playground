@@ -1,0 +1,10 @@
+
+os_library_practicing
+.git
+task2.db
+async
+.vscode
+task1.db
+chromadb
+test_db
+agentic-things
