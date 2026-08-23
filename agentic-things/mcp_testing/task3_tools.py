@@ -1,6 +1,8 @@
 from mcp.server import MCPServer
 from typing import Annotated
+from pathlib import Path
 from pydantic import Field
+import sys
 import os
 
 mcp = MCPServer("file helper tools")
@@ -23,17 +25,38 @@ def function_for_content_fetcher(path:str,file_connection,depth:int=0):
                                                function_for_content_fetcher(full_path,file_connection,depth+1)
                                      else :
                                                 file_connection.write(f"\n{indent} {item}")
+
+
 @mcp.tool()
 def making_absolute_path(
         path:Annotated[str,Field(description="The raw path or location exactly as the user described it, in any form — relative, partial, or absolute. Do not attempt to correct, clean, or guess the proper format yourself; pass it as-is and this tool will resolve it correctly.")]
         ):
-        "Converts any path or location description into a correct, complete absolute path. This tool must be called first, before any other tool that takes a path argument (content_fetcher, specific_entry_lister, specific_entry_adder, entry_remover, specific_entry_exist_checker). Pass whatever location the user described, in whatever form they gave it — this tool handles resolving it correctly. Use the exact result this tool returns as the path argument for the next tool call."
+        "Converts any path or location description into a correct, complete absolute path. This tool must be called first, before any other tool that takes a path argument (content_fetcher, specific_entry_lister, specific_entry_adder, entry_remover, specific_entry_exist_checker). Pass whatever location the user described, in whatever form they gave it — this tool handles resolving it correctly. Use the exact result this tool returns as the path argument for the next tool call." 
         BASE_DIR = "/home/coder"
         if os.path.isabs(path):
                 real_path = path
         else :
                 real_path = os.path.join(BASE_DIR,path)
         return os.path.normpath(real_path)
+
+@mcp.tool()
+def finding_real_path_of_entry(
+        entry_name : Annotated[str,Field(description="he exact file or folder name to search for (not a full path) — for example 'mcp_testing' or 'task3_tools.py'. Do not include any folder path, just the name itself.")]
+        ):
+        "Searches the entire home directory recursively for a file or folder matching the given name, and returns its real, full path. Use this when you only know a file or folder's name but not its exact location. If exactly one match is found, returns its full path. If multiple matches are found, returns a list of all matching paths so the correct one can be chosen. If no match is found, returns a message stating the path does not exist."
+        data = None
+        home = Path.home()
+        string_home = str(home)
+        matches = list(Path(string_home).rglob(entry_name))
+        if len(matches) == 1 :
+                data = str(matches[0])
+                print(data,file=sys.stderr)
+        elif len(matches) > 1:
+                data = [str(m) for m in matches]
+                print(data,file=sys.stderr)
+        else :
+                data = "Path doesnt exist"
+        return data
 
 @mcp.tool()
 def entry_remover(

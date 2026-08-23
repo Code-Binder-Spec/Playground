@@ -4,6 +4,7 @@ import asyncio
 from dotenv import load_dotenv
 import os
 import json
+from pathlib import Path
 from groq import Groq
 
 load_dotenv()
@@ -57,16 +58,16 @@ async def actual_agentic_function(messages,groq_tools,session):
                                                                          {
                                                                              "role":"tool",
                                                                              "tool_call_id":tool_call.id,
-                                                                             "Content":{result.content[0].text}
+                                                                             "content":result.content[0].text
                                                                                               }
                                                                                    )
-                                        ai_reply = calling_ai(groq_client,f"You are evaluating whether an AI agent correctly fulfilled a user's request by calling the appropriate tool(s). You will be given the full conversation history, including the user's request, which tools the agent called, with what arguments, and the results returned. Your only job is to judge whether the agent's tool calls functionally satisfied what the user actually asked for. The number of tool calls, which specific tools were used, or the order of calls does not matter — only whether the end result accomplishes what the user needed. If the agent's actions correctly satisfied the user's request, respond with exactly: CORRECT. If the agent's actions did NOT satisfy the user's request, respond with: INCORRECT, followed by a brief, specific reason why.\n\nConversational history : {messages}")
+                                        ai_reply = calling_ai(groq_client,f"You are evaluating whether an AI agent correctly fulfilled a user's request by calling the appropriate tool(s). You will be given the full conversation history, including the user's request, which tools the agent called, with what arguments, and the results returned. Your only job is to judge whether the agent's tool calls functionally satisfied what the user actually asked for. The number of tool calls, which specific tools were used, or the order of calls does not matter — only whether the end result accomplishes what the user needed. If the agent's actions correctly satisfied the user's request, respond with exactly: CORRECT. If the agent's actions did NOT satisfy the user's request, respond with: DIDNT APPROVED, followed by a brief, specific reason why.\n\nConversational history : {messages}")
                                         print(ai_reply)
                                         if "correct" in ai_reply.lower():
                                                                         data = ("correct",result.content[0].text)
                                                                         break
                                         else :
-                                                                        messages.append({"role":"system","Reason for failiure":f"{ai_reply}"})
+                                                                        messages.append({"role":"system","content":f"{ai_reply}"})
                                                                         continue
                             else :
                                     data = ("again",response.choices[0].message.content)
@@ -84,9 +85,11 @@ async def main():
                          await session.initialize()
                          tool_response = await session.list_tools()
                          groq_tools = making_into_groq_format(tool_response.tools)
+                         object_home = Path.home()
+                         string_home = str(object_home)
                          first = True
                          messages = [
-                                  {"role": "system", "content": "When a task requires a file or folder path, follow these rules exactly. First, the user must specify at least two location segments (for example, 'documents/testing', not just 'testing' alone) before you call any path-related tool. If the user provides only a single, bare location with no further context, do not call a tool — ask a clarifying question asking for the fuller path instead. Second, if the user's location starts with or refers to 'coder' as the top-level folder (for example, 'coder' alone, or 'coder/something', in any capitalization), treat this as meaning /home/coder — prepend /home in front of it, and do not add an extra 'coder' folder underneath. Third, for any other relative location the user gives, pass it exactly as described, with no leading slash added or removed by you. Once you have determined the correct raw location using these rules, always call resolve_absolute_path first with that value, and use the exact result it returns as the path argument for any subsequent tool call — never modify, guess, or construct the final absolute path yourself. More generally, if the user's request is missing any necessary details — for a path or otherwise — do not call a tool; ask a clarifying question first instead."}
+                                  {"role": "system", "content": f"Whenever a task requires a file or folder, follow these rules. If the user refers to their home directory by itself (with no further location specified), use exactly this path: {string_home} . If the user's request goes beyond just the home directory — naming a specific file or folder inside it — call finding_real_path_of_entry with just that name (not a full path). Otherwise, for any task requiring a file or folder, always call finding_real_path_of_entry first with just the name before calling any other tool. If it returns a single path, use that exact path for the next tool call. If it returns multiple matches, do not proceed — list the matches for the user and ask which one they mean, then use their answer to select the correct path before calling the next tool. If it returns that the path doesn't exist, tell the user and do not proceed with any further tool call."}
                          ]
                          data = None
                          first_prompt = "Enter the operation of a file "
