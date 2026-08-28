@@ -2,7 +2,6 @@ from mcp.server import MCPServer
 from typing import Annotated
 from pathlib import Path
 from pydantic import Field
-import sys
 import os
 
 mcp = MCPServer("file helper tools")
@@ -40,20 +39,18 @@ def making_absolute_path(
         return os.path.normpath(real_path)
 
 @mcp.tool()
-def finding_real_path_of_entry(
+def finding_real_paths_of_entry(
         entry_name : Annotated[str,Field(description="he exact file or folder name to search for (not a full path) — for example 'mcp_testing' or 'task3_tools.py'. Do not include any folder path, just the name itself.")]
         ):
-        "Searches the entire home directory recursively for a file or folder matching the given name, and returns its real, full path. Use this when you only know a file or folder's name but not its exact location. If exactly one match is found, returns its full path. If multiple matches are found, returns a list of all matching paths so the correct one can be chosen. If no match is found, returns a message stating the path does not exist."
+        "Searches the entire home directory recursively for a file or folder matching the given name, and returns its real, full path. Use this when you only know a file or folder's name but not its exact location. This function can also be used to find how many paths exist for the same folder or file name. If exactly one match is found, returns its full path. If multiple matches are found, returns a list of all matching paths so the correct one can be chosen by user. If no match is found, returns a message stating the path does not exist."
         data = None
         home = Path.home()
         string_home = str(home)
         matches = list(Path(string_home).rglob(entry_name))
         if len(matches) == 1 :
                 data = str(matches[0])
-                print(data,file=sys.stderr)
         elif len(matches) > 1:
                 data = [str(m) for m in matches]
-                print(data,file=sys.stderr)
         else :
                 data = "Path doesnt exist"
         return data
