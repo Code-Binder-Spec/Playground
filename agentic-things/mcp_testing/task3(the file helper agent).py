@@ -125,7 +125,7 @@ async def main():
                                                                                                                          data =  result[1]
                                                                                                                          continue
                                                                                                               else :
-                                                                                                                       print(f"{result[1]} : agents job done :",result[2])
+                                                                                                                       print(f"{result[1]} \n : agents job done :",result[2])
                                                                                                                        break
                                                                                                   elif "again" in result:
                                                                                                                           data = result[1]
