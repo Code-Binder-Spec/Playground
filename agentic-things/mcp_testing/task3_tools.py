@@ -83,7 +83,7 @@ def content_fetcher(
     data = None
     try:
                       checking_path_exist(path)
-                      path_for_content_fetcher = "/home/coder"
+                      path_for_content_fetcher = str(Path.home())
                       full_path_content_tree = os.path.join(path_for_content_fetcher,"Content_tree.txt")
                       with open(full_path_content_tree,"w+") as f :
                               function_for_content_fetcher(path,f)
@@ -169,6 +169,59 @@ def specific_entry_adder(
                        data =   f"{type} creation failed due to error : {e}"
         return data
 
+def func_for_direct_lister(path,file_connection):
+        items = os.listdir(path)
+        for item in items:
+                full_path = os.path.join(path,item)
+                if os.path.isdir(full_path):
+                        typ = "folder"
+                else :
+                        typ = "file"
+                file_connection.write(f"\n{item} : {typ}")
+
+def function_for_file_nested_type_lister(path,file_connection):
+        items = os.listdir(path)
+        for item in items:
+                full_path = os.path.join(path,item)
+                if os.path.isfile(full_path):
+                                 file_connection.write(f"\n{item}")
+                
+
+
+mcp.tool()
+def nested_type_lister(
+                path : Annotated[str,Field(description="The folder path to list specific type content all levels")],
+                type : Annotated[str,Field(description="The type to fetch . folder or file")]
+                   ):
+        try :
+                if os.path.isfile(path):
+                        raise ValueError("Only folders are allowed")
+                path_for_nested_lister = str(Path.home())
+                full_path_nested_lister = os.path.join(path_for_nested_lister,"Nested_lister")
+                with open(f"{full_path_nested_lister}.txt","w+") as f :
+                              if type.lower() == "file":
+                                      
+
+
+
+mcp.tool()
+def direct_lister(
+              path : Annotated[str,Field(description="The folder path to list the direct contents only one level deeper.")]              
+                ):
+        "List direct contents(include both folder and file) inside a folder . One level deeper"
+        try :
+                 if os.path.isfile(path):
+                         raise ValueError("Only folder is allowed for fetching direct contents")
+                 path_for_direct_lister = str(Path.home())
+                 full_path_direct_lister = os.path.join(path_for_direct_lister,"Direct_contents")
+                 with open(f"{full_path_direct_lister}".txt,"w+") as f:
+                         func_for_direct_lister(path,f)
+                         f.seek(0)
+                         data = f.read()
+        except Exception as e :
+                 data = f"Direct lister failed due to error : {e}"
+        return data 
+                         
 
 def checking_the_safety_of_data(path):
         safe_root = "/home/coder/Videos"
