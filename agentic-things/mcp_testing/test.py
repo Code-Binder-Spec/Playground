@@ -1,2 +1,2 @@
-from pathlib import Path
-print(str(Path.home()))
+ham = 1>2
+print(ham)

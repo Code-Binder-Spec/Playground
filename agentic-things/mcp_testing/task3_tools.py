@@ -179,13 +179,35 @@ def func_for_direct_lister(path,file_connection):
                         typ = "file"
                 file_connection.write(f"\n{item} : {typ}")
 
-def function_for_file_nested_type_lister(path,file_connection):
-        items = os.listdir(path)
-        for item in items:
-                full_path = os.path.join(path,item)
-                if os.path.isfile(full_path):
-                                 file_connection.write(f"\n{item}")
+def writing_function(items,file_connection):
+            for item in items:
+                     file_connection.write(f"\n{item}")
+
+def actual_nested_type_file_lister(path,file_connection):
+                                      while True:
+                                                         new_path = Path(path)
+                                                         files = [p.name for p in new_path.iterdir() if p.is_file()]
+                                                         folders = [p.name for p in new_path.iterdir() if p.is_dir()]
+                                                         if files:
+                                                                      writing_function(files,file_connection)
+                                                         if folders:
+                                                                 for folder in folders:
+                                                                         full_path = os.path.join(path,folder)
+                                                                         actual_nested_type_file_lister(full_path,file_connection)
+                                                         else :
+                                                                 break
                 
+
+def func_for_folder_nested_type_lister(path,file_connection):
+                new_path = Path(path)
+                folders = [p.name for p in new_path.iterdir() if p.is_dir()]
+                if folders:
+                        writing_function(folders,file_connection)
+                        for folder in folders:
+                                full_path = os.path.join(path,folder)
+                                func_for_folder_nested_type_lister(full_path,file_connection)
+                else :
+                         pass
 
 
 mcp.tool()
@@ -199,11 +221,17 @@ def nested_type_lister(
                 path_for_nested_lister = str(Path.home())
                 full_path_nested_lister = os.path.join(path_for_nested_lister,"Nested_lister")
                 with open(f"{full_path_nested_lister}.txt","w+") as f :
-                              if type.lower() == "file":
-                                      
+                        if type == "file":
+                                actual_nested_type_file_lister(path,f)
+                        else:
+                                func_for_folder_nested_type_lister(path,f)
+                        f.seek(0)
+                        data = f.read()
+        except Exception as e :
+                data =  f"Specific file type all levels failed due to error : {e}"
+        return data
 
-
-
+                                   
 mcp.tool()
 def direct_lister(
               path : Annotated[str,Field(description="The folder path to list the direct contents only one level deeper.")]              
