@@ -212,9 +212,10 @@ def func_for_folder_nested_type_lister(path,file_connection):
 
 mcp.tool()
 def nested_type_lister(
-                path : Annotated[str,Field(description="The folder path to list specific type content all levels")],
-                type : Annotated[str,Field(description="The type to fetch . folder or file")]
+                path : Annotated[str,Field(description="The top-level folder path to search within. All nested subfolders inside this path will be searched as well.")],
+                type : Annotated[str,Field(description="Must be exactly 'file' or 'folder'. Determines whether only files or only folders are returned, at any depth.")]
                    ):
+        "Recursively searches the given folder and all of its nested subfolders, returning only entries of the specified type — either all files, or all folders — found at any depth. Use this when the user wants a filtered list (files only, or folders only) across an entire folder tree, not just the top level. For an unfiltered, fully recursive listing of everything, use content_fetcher instead. For a filtered listing of just the top level (one level deep, not nested), use specific_entry_lister instead."
         try :
                 if os.path.isfile(path):
                         raise ValueError("Only folders are allowed")
@@ -234,9 +235,9 @@ def nested_type_lister(
                                    
 mcp.tool()
 def direct_lister(
-              path : Annotated[str,Field(description="The folder path to list the direct contents only one level deeper.")]              
+              path : Annotated[str,Field(description="The folder path whose direct contents you want listed — only the files and folders immediately inside this path, not anything nested further.")]              
                 ):
-        "List direct contents(include both folder and file) inside a folder . One level deeper"
+        "Lists everything directly inside the given folder — both files and folders together, one level only. Does not include anything nested inside subfolders."
         try :
                  if os.path.isfile(path):
                          raise ValueError("Only folder is allowed for fetching direct contents")
