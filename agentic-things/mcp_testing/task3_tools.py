@@ -2,6 +2,7 @@ from mcp.server import MCPServer
 from typing import Annotated
 from pathlib import Path
 from pydantic import Field
+import sys
 import os
 
 mcp = MCPServer("file helper tools")
@@ -114,7 +115,7 @@ def specific_entry_exist_checker(
 
 @mcp.tool()       
 def specific_entry_lister(
-        type: Annotated[str,Field(description="Must be exactly 'file' to list only files, or 'folder' to list only folders. No other values are valid.")],
+        type: Annotated[str,Field(description="Must be exactly 'file' to list only files, or 'folder' to list only folders, at one level only — not including nested subfolders. No other values are valid.")],
         path: Annotated[str,Field(description="The folder path to list content from.")]
                           ):
         "Lists only the files or only the folders (not both) directly inside a given directory, one level deep — does not look inside subfolders."
@@ -182,23 +183,24 @@ def func_for_direct_lister(path,file_connection):
 def writing_function(items,file_connection):
             for item in items:
                      file_connection.write(f"\n{item}")
-
+            print("writing function called",file=sys.stderr)
 def actual_nested_type_file_lister(path,file_connection):
-                                      while True:
+                                                         print("loop running",file=sys.stderr)
                                                          new_path = Path(path)
                                                          files = [p.name for p in new_path.iterdir() if p.is_file()]
                                                          folders = [p.name for p in new_path.iterdir() if p.is_dir()]
                                                          if files:
+                                                                      print("until file function no problem",file=sys.stderr)
                                                                       writing_function(files,file_connection)
                                                          if folders:
                                                                  for folder in folders:
                                                                          full_path = os.path.join(path,folder)
+                                                                         print("until folder function no problem",file=sys.stderr)
                                                                          actual_nested_type_file_lister(full_path,file_connection)
-                                                         else :
-                                                                 break
                 
 
 def func_for_folder_nested_type_lister(path,file_connection):
+                print("folder function started",file=sys.stderr)
                 new_path = Path(path)
                 folders = [p.name for p in new_path.iterdir() if p.is_dir()]
                 if folders:
@@ -208,9 +210,10 @@ def func_for_folder_nested_type_lister(path,file_connection):
                                 func_for_folder_nested_type_lister(full_path,file_connection)
                 else :
                          pass
+                print("folder function ended",file=sys.stderr)
 
 
-mcp.tool()
+@mcp.tool()
 def nested_type_lister(
                 path : Annotated[str,Field(description="The top-level folder path to search within. All nested subfolders inside this path will be searched as well.")],
                 type : Annotated[str,Field(description="Must be exactly 'file' or 'folder'. Determines whether only files or only folders are returned, at any depth.")]
@@ -222,18 +225,20 @@ def nested_type_lister(
                 path_for_nested_lister = str(Path.home())
                 full_path_nested_lister = os.path.join(path_for_nested_lister,"Nested_lister")
                 with open(f"{full_path_nested_lister}.txt","w+") as f :
+                        print("until function no problem ",file=sys.stderr)
                         if type == "file":
                                 actual_nested_type_file_lister(path,f)
                         else:
                                 func_for_folder_nested_type_lister(path,f)
                         f.seek(0)
                         data = f.read()
+                print("after function no problem",file=sys.stderr)
         except Exception as e :
                 data =  f"Specific file type all levels failed due to error : {e}"
         return data
 
                                    
-mcp.tool()
+@mcp.tool()
 def direct_lister(
               path : Annotated[str,Field(description="The folder path whose direct contents you want listed — only the files and folders immediately inside this path, not anything nested further.")]              
                 ):
